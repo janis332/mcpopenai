@@ -22,7 +22,7 @@ server.tool({
     ),
   }),
   handler: async ({ query }) => {
-    const xmlUrl = "https://www.spanienweinonline.ch/AI.xml?key=CHat@swol.ch25!";
+    const xmlUrl = "https://www.spanienweinonline.ch/AI.xml?key=CHat@sw34234ol.csdfsdfh25!";
     const xml = await (await fetch(xmlUrl)).text();
 
     const results = [...xml.matchAll(/<product>([\s\S]*?)<\/product>/g)]
