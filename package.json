@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-"@modelcontextprotocol/sdk": "https://github.com/modelcontextprotocol/sdk.git"
+"@modelcontextprotocol/sdk": "https://github.com/modelcontextprotocol/sdk.git",
     "zod": "^3.23.8"
   }
 }
