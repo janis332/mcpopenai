@@ -34,7 +34,7 @@ async function fetchAndParseXml() {
   if (!products) throw new Error("No <product> elements found in XML feed.");
 
   // Limit to top 10 entries
-  const limited = Array.isArray(products) ? products.slice(0, 10) : [products];
+  const limited = Array.isArray(products) ? products.slice(0, 5000) : [products];
 
   const items = limited.map((p, i) => ({
     __id: String(p["product-id"] ?? `item-${i}`),
