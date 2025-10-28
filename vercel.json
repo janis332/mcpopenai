@@ -1,5 +1,7 @@
 {
-  "builds": [
-    { "src": "api/mcp.js", "use": "@vercel/node" }
-  ]
+  "functions": {
+    "api/mcp.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
 }
