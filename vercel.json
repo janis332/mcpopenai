@@ -1,7 +1,7 @@
 {
   "functions": {
     "api/mcp.js": {
-      "runtime": "nodejs18.x"   // forces full Node.js, not edge
+      "runtime": "nodejs18.x"
     }
   }
 }
