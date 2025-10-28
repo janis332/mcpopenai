@@ -1,10 +1,10 @@
 console.log("🚀 MCP Server initialized - ready to handle requests");
 
-import { createServer } from "@modelcontextprotocol/sdk/server";
+import { Server } from "@modelcontextprotocol/sdk";
 import { z } from "zod";
 
 // Create an MCP server instance
-const server = createServer({
+const server = new Server({
   name: "sample-mcp",
   version: "1.0.0",
 });
@@ -24,7 +24,7 @@ server.tool({
   },
 });
 
-// === Example API route handler for Vercel ===
+// === Example API route handler for Render ===
 export default async function handler(req, res) {
   if (req.method === "OPTIONS") {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -33,10 +33,8 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  // Handle JSON-RPC requests
   const response = await server.handleRequest(req);
   res.status(response.status || 200);
   res.setHeader("Content-Type", "application/json");
   res.send(await response.text());
 }
-
