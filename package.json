@@ -1,13 +1,16 @@
 {
-  "name": "mcpopenai2",
+  "name": "mcp-render",
   "version": "1.0.0",
   "type": "module",
   "main": "api/mcp.js",
+  "scripts": {
+    "start": "node api/mcp.js"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "zod": "latest"
   },
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   }
 }
