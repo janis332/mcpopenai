@@ -2,9 +2,9 @@
   "name": "wein-mcp",
   "version": "1.0.0",
   "type": "module",
+  "main": "api/mcp.js",
   "dependencies": {
-   "@modelcontextprotocol/sdk": "https://registry.npmjs.org/@modelcontextprotocol/sdk/-/sdk-0.2.0.tgz",
-
-    "zod": "^3.23.8"
+    "@modelcontextprotocol/sdk": "latest",
+    "zod": "latest"
   }
 }
