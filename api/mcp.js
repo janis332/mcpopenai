@@ -1,3 +1,5 @@
+console.log("🚀 MCP Server initialized - ready to handle requests");
+
 import { createServer } from "@modelcontextprotocol/sdk/server";
 import { z } from "zod";
 
