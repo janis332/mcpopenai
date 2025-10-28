@@ -1,53 +1,67 @@
 import express from "express";
 import cors from "cors";
 import fetch from "node-fetch";
-import FastXMLParser from "fast-xml-parser";
+import { XMLParser } from "fast-xml-parser";
 import { z } from "zod";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
-// Remote XML file
 const XML_URL = "https://www.spanienweinonline.ch/AI.xml?key=CHat@swol.ch25!";
 
-// --- Cache so we don’t hammer the endpoint
+// Cache to avoid re-fetching big XML each time
 let cache = null;
 let cacheTime = 0;
-const CACHE_TTL = 60_000; // 1 minute
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
 async function fetchAndParseXml() {
   const now = Date.now();
   if (cache && now - cacheTime < CACHE_TTL) return cache;
 
+  console.log("⏳ Fetching XML feed...");
   const res = await fetch(XML_URL);
   if (!res.ok) throw new Error(`Failed to fetch XML: ${res.status} ${res.statusText}`);
   const xmlText = await res.text();
 
-  const parsed = FastXMLParser.parse(xmlText, {
+  const parser = new XMLParser({
     ignoreAttributes: false,
     attributeNamePrefix: "@_",
     trimValues: true,
     parseTagValue: true
   });
 
-  // Try to locate array-like nodes
-  const items = [];
-  function collect(obj, prefix = "") {
-    if (Array.isArray(obj)) {
-      obj.forEach((v, i) => collect(v, `${prefix}[${i}]`));
-    } else if (obj && typeof obj === "object") {
-      const primitiveProps = Object.values(obj).every(v => typeof v !== "object");
-      if (primitiveProps) items.push({ __id: prefix || "item-" + items.length, ...obj });
-      else for (const key of Object.keys(obj)) collect(obj[key], prefix ? `${prefix}.${key}` : key);
-    }
-  }
-  collect(parsed);
+  const parsed = parser.parse(xmlText);
+  const products = parsed["vivino-product-list"]?.product;
+  if (!products) throw new Error("No <product> elements found in XML feed.");
+
+  // Limit to top 10 entries
+  const limited = Array.isArray(products) ? products.slice(0, 10) : [products];
+
+  const items = limited.map((p, i) => ({
+    __id: String(p["product-id"] ?? `item-${i}`),
+    name: p["wine-name"] ?? "",
+    price: p.price ?? "",
+    link: p.link ?? "",
+    ...(p.extras || {}) // flatten extras
+  }));
 
   cache = { items };
   cacheTime = now;
+  console.log(`✅ Cached ${items.length} XML items.`);
   return cache;
 }
 
-// --- MCP server setup ---
+// Prefetch XML on startup
+(async () => {
+  try {
+    console.log("⏳ Prefetching XML feed...");
+    await fetchAndParseXml();
+    console.log("✅ XML cached and ready!");
+  } catch (err) {
+    console.error("⚠️ Prefetch failed:", err.message);
+  }
+})();
+
+// --- MCP Server Setup ---
 const server = new McpServer({ name: "xml-mcp", version: "1.0.0" });
 
 // Tool: search
@@ -58,7 +72,11 @@ server.registerTool(
     description: "Searches the XML feed by text value",
     inputSchema: { q: z.string().describe("Search query") },
     outputSchema: {
-      results: z.array(z.object({ id: z.string(), title: z.string().optional(), snippet: z.string().optional() }))
+      results: z.array(z.object({
+        id: z.string(),
+        title: z.string().optional(),
+        snippet: z.string().optional()
+      }))
     }
   },
   async ({ q }) => {
@@ -69,7 +87,7 @@ server.registerTool(
       .slice(0, 25)
       .map(it => ({
         id: it.__id,
-        title: it.title || it.name || Object.values(it)[0],
+        title: it.name || it.title || Object.values(it)[0],
         snippet: JSON.stringify(it).slice(0, 100)
       }));
 
