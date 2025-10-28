@@ -1,10 +1,13 @@
 {
-  "name": "wein-mcp",
+  "name": "mcpopenai2",
   "version": "1.0.0",
   "type": "module",
   "main": "api/mcp.js",
   "dependencies": {
     "@modelcontextprotocol/sdk": "latest",
     "zod": "latest"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
