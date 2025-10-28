@@ -7,10 +7,7 @@
     "start": "node api/mcp.js"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "latest",
-    "zod": "latest"
-  },
-  "engines": {
-    "node": "20.x"
+    "@modelcontextprotocol/sdk": "0.2.0",
+    "zod": "^3.23.8"
   }
 }
