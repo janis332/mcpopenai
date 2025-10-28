@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" }
+  "builds": [
+    { "src": "api/mcp.js", "use": "@vercel/node@3.0.0" }
   ]
 }
