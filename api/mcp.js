@@ -85,7 +85,7 @@ server.registerTool(
     const qLower = q.toLowerCase();
     const results = items
       .filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(qLower)))
-      .slice(0, 20) // ✅ limit results to top 20
+      .slice(0, 5) // ✅ limit results to top 20
       .map(it => ({
         id: it.__id,
         title: it.name || it.title || Object.values(it)[0],
