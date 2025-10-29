@@ -65,6 +65,7 @@ async function fetchAndParseXml() {
 const server = new McpServer({ name: "xml-mcp", version: "1.0.0" });
 
 // Tool: search
+// Tool: search
 server.registerTool(
   "search",
   {
@@ -84,11 +85,11 @@ server.registerTool(
     const qLower = q.toLowerCase();
     const results = items
       .filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(qLower)))
-      .slice(0, 25)
+      .slice(0, 20) // ✅ limit results to top 20
       .map(it => ({
         id: it.__id,
         title: it.name || it.title || Object.values(it)[0],
-        snippet: JSON.stringify(it).slice(0, 100)
+        snippet: JSON.stringify(it)
       }));
 
     return {
@@ -97,6 +98,7 @@ server.registerTool(
     };
   }
 );
+
 
 // Tool: fetch
 server.registerTool(
