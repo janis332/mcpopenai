@@ -80,23 +80,34 @@ server.registerTool(
       }))
     }
   },
-  async ({ q }) => {
-    const { items } = await fetchAndParseXml();
-    const qLower = q.toLowerCase();
-    const results = items
-      .filter(it => Object.values(it).some(v => String(v).toLowerCase().includes(qLower)))
-      .slice(0, 5) // ✅ limit results to top 20
-      .map(it => ({
-        id: it.__id,
-        title: it.name || it.title || Object.values(it)[0],
-        snippet: JSON.stringify(it)
-      }));
+async ({ q }) => {
+  const { items } = await fetchAndParseXml();
+  const qWords = q.toLowerCase().split(/\s+/).filter(Boolean);
 
-    return {
-      content: [{ type: "text", text: JSON.stringify({ results }, null, 2) }],
-      structuredContent: { results }
-    };
-  }
+  // Score items by number of matched words
+  const scored = items.map(it => {
+    const text = Object.values(it).join(" ").toLowerCase();
+    const score = qWords.reduce((acc, word) => acc + (text.includes(word) ? 1 : 0), 0);
+    return { it, score };
+  });
+
+  // Keep only matches, sort by score, limit
+  const results = scored
+    .filter(r => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10)
+    .map(({ it }) => ({
+      id: it.__id,
+      title: it.name || it.title || Object.values(it)[0],
+      snippet: JSON.stringify(it)
+    }));
+
+  return {
+    content: [{ type: "text", text: JSON.stringify({ results }, null, 2) }],
+    structuredContent: { results }
+  };
+}
+
 );
 
 
